@@ -14,6 +14,9 @@ env:
 jobs:
   build-libs:
     runs-on: ${{ matrix.runner }}
+    # The FreeBSD leg builds inside a third-party VM and has no hosted runner.
+    # A VM/pkg failure must not block npm releases for every other platform.
+    continue-on-error: ${{ matrix.freebsd == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -51,6 +54,11 @@ jobs:
             target: aarch64-pc-windows-msvc
             out:    rust_pty_arm64.dll
             rustflags: -C target-feature=+crt-static
+          # FreeBSD has no GitHub-hosted runner, so build it in a FreeBSD VM.
+          - runner: ubuntu-22.04
+            target: x86_64-unknown-freebsd
+            freebsd: true
+            out:    librust_pty_freebsd.so
 
     steps:
       - uses: actions/checkout@v7
@@ -58,11 +66,13 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust
+        if: "!matrix.freebsd"
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
 
       - uses: Swatinem/rust-cache@v2
+        if: "!matrix.freebsd"
 
       - name: Install zigbuild
         if: matrix.zigbuild_target
@@ -79,14 +89,34 @@ jobs:
           cargo zigbuild --release --target ${{ matrix.zigbuild_target }}
 
       - name: Build rust-pty
-        if: "!matrix.zigbuild_target"
+        if: "!matrix.zigbuild_target && !matrix.freebsd"
         env:
           RUSTFLAGS: ${{ matrix.rustflags }}
         run: |
           cd rust-pty
           cargo build --release --target ${{ matrix.target }}
 
+      - name: Build rust-pty (FreeBSD)
+        if: matrix.freebsd
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: "15.0"
+          usesh: true
+          # pkg's rust needs FBSD_1.9 libc, which the 15.0 image lacks.
+          # Install the official toolchain via rustup instead.
+          prepare: |
+            fetch -o /tmp/rustup-init https://static.rust-lang.org/rustup/dist/x86_64-unknown-freebsd/rustup-init
+            chmod +x /tmp/rustup-init
+            /tmp/rustup-init -y --default-toolchain stable --profile minimal
+          run: |
+            . "$HOME/.cargo/env"
+            cd rust-pty
+            cargo build --release
+            mkdir -p ../out
+            cp target/release/librust_pty.so "../out/${{ matrix.out }}"
+
       - name: Collect artefact
+        if: "!matrix.freebsd"
         shell: bash
         run: |
           mkdir -p out

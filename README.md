@@ -8,7 +8,7 @@ A cross-platform pseudo-terminal (PTY) implementation for Bun, powered by Rust's
 
 ## 🚀 Features
 
-- **Cross-platform** - Works on macOS, Linux, and Windows
+- **Cross-platform** - Works on macOS, Linux, FreeBSD, and Windows
 - **Simple API** - Clean Promise-based API similar to node-pty
 - **Type-safe** - Complete TypeScript definitions included
 - **Efficient** - Rust backend with proper error handling and multithreading
@@ -33,6 +33,7 @@ bun add bun-pty
 | macOS    | ✅     | Fully supported |
 | Linux    | ✅     | Fully supported |
 | Windows  | ✅     | Fully supported |
+| FreeBSD  | ✅     | x64 prebuilt; ARM64 requires a local build |
 
 ## 🆚 bun-pty or `Bun.Terminal`?
 
@@ -42,7 +43,7 @@ bun-pty is the better fit when you want:
 
 - **The core of the node-pty API** - `spawn()`, `write()`, `onData`, `onExit`, `resize()` and `kill()`, with node-pty's option and event shapes, so code that sticks to these ports with little or no change. Not supported: the `uid`, `gid`, `encoding`, `handleFlowControl` and `useConpty` options, and `pause()`, `resume()` and `clear()`
 - **node-pty's environment rules** - `env` is the child's whole environment, `TERM` comes from `name`, and `PWD` follows `cwd`
-- **The same backend on every platform** - one Rust ([portable-pty](https://crates.io/crates/portable-pty)) implementation on macOS, Linux (glibc and musl) and Windows (x64 and ARM64)
+- **The same backend on every platform** - one Rust ([portable-pty](https://crates.io/crates/portable-pty)) implementation on macOS, Linux (glibc and musl), FreeBSD (x64) and Windows (x64 and ARM64)
 
 ## 🚦 Usage
 
@@ -242,7 +243,7 @@ bun test
 
 ### Prebuilt Binaries
 
-The npm package includes prebuilt binaries for macOS, Linux, and Windows. If you encounter issues with the prebuilt binaries, you can build from source:
+The npm package includes prebuilt binaries for macOS, Linux, FreeBSD (x64), and Windows. If you encounter issues with the prebuilt binaries, you can build from source:
 
 ```bash
 # In your project directory

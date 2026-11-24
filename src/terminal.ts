@@ -53,7 +53,7 @@ function resolveLibPath(): string {
 	// See: https://github.com/sursatech/bun-pty/issues/19
 	try {
 		// @ts-ignore - require returns path for binary files in Bun
-		const embeddedPath = require(`../rust-pty/target/release/${process.platform === "win32" ? (process.arch === "arm64" ? "rust_pty_arm64.dll" : "rust_pty.dll") : process.platform === "darwin" ? (process.arch === "arm64" ? "librust_pty_arm64.dylib" : "librust_pty.dylib") : process.arch === "arm64" ? "librust_pty_arm64.so" : "librust_pty.so"}`);
+		const embeddedPath = require(`../rust-pty/target/release/${process.platform === "win32" ? (process.arch === "arm64" ? "rust_pty_arm64.dll" : "rust_pty.dll") : process.platform === "darwin" ? (process.arch === "arm64" ? "librust_pty_arm64.dylib" : "librust_pty.dylib") : process.platform === "freebsd" ? (process.arch === "arm64" ? "librust_pty_arm64_freebsd.so" : "librust_pty_freebsd.so") : process.arch === "arm64" ? "librust_pty_arm64.so" : "librust_pty.so"}`);
 		if (embeddedPath && !musl) return embeddedPath;
 	} catch {
 		// Not running as compiled binary, fall through to dynamic resolution

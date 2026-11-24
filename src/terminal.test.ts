@@ -18,6 +18,21 @@ describe("native library resolution", () => {
 	test("keeps the generic DLL name on Windows x64", () => {
 		expect(libraryFilenames("win32", "x64", false)).toEqual(["rust_pty.dll"]);
 	});
+
+	test("prefers the FreeBSD lib on FreeBSD x64", () => {
+		expect(libraryFilenames("freebsd", "x64", false)).toEqual([
+			"librust_pty_freebsd.so",
+			"librust_pty.so",
+		]);
+	});
+
+	test("prefers the ARM64 FreeBSD lib on FreeBSD ARM64", () => {
+		expect(libraryFilenames("freebsd", "arm64", false)).toEqual([
+			"librust_pty_arm64_freebsd.so",
+			"librust_pty_freebsd.so",
+			"librust_pty.so",
+		]);
+	});
 });
 
 describe("Bun version check", () => {
