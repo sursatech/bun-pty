@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] - 2026-11-24
+
+### Added
+- FreeBSD x64 support: the npm package now ships a prebuilt `librust_pty_freebsd.so` (#55)
+  - `bun build --compile --target=bun-freebsd-x64` embeds it
+  - FreeBSD ARM64 has no prebuilt library yet; build from source with `bun run build`, or point `BUN_PTY_LIB` at your build
+  - The library is built on FreeBSD 15.0
+
+### Changed
+- The release workflow gives each job only the permissions it needs, and the FreeBSD VM action is pinned to a commit
+
 ## [0.6.1] - 2026-11-16
 
 ### Changed
